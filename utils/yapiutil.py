@@ -4,6 +4,7 @@ from utils.logutil import logger
 import commom.osbase as osbase
 from utils.createcaseutil import CreateCase
 
+
 positive_case_file = r'utils/data/positive_case.json'
 negative_case_file = r"utils/data/negative_case.json"
 
@@ -11,8 +12,8 @@ cr = CreateCase()
 sql = RdTestcase()
 url = 'http://yapi.xbongbong.com'
 # token = '841a5e8fb8251976ba069eef55158a12213f715d9465eeb26ac0f1052bcce1a6'
-token = '02fd2e0c38d31c1e763e25dddaea01972c30b6c0a4d7c7d7abc87ffd0a32fe42'
-
+# token = '02fd2e0c38d31c1e763e25dddaea01972c30b6c0a4d7c7d7abc87ffd0a32fe42'
+token = '962fd4813aa01538ad26ef57555738e4e7c485d5ca656e70be723bb5a35afa4f'
 
 class Yapi:
     def __init__(self):
@@ -25,7 +26,7 @@ class Yapi:
             'Content-Type': 'application/x-www-form-urlencoded'
         }
         body = {
-            'project_id': 735,  # 项目id
+            'project_id': 1867,  # 项目id
             'token': token
         }
         cat_id_list = []
@@ -38,9 +39,9 @@ class Yapi:
                 for i in range(len(data)):
                     cat_id = data[i]['_id']
                     name = data[i]['name']
-                    print(data[i])
+                    # print(data[i])
                     # 打印项目信息
-                    print(f'cat_id:{cat_id}\t\tname:{name}')
+                    logger.debug(f'cat_id:{cat_id}\t\tname:{name}')
                     cat_id_list.append(cat_id)
             # 返回数据错误
             else:
@@ -74,9 +75,10 @@ class Yapi:
                         data_dict['id'] = self.id
                         interface_data_list.append(data_dict)
                 else:
-                    print(response['errcode'])
+                    logger.error(response['errcode'])
             except Exception as e:
-                print(e)
+                logger.error(e)
+        logger.debug(f'获取{len(interface_data_list)}条接口数据')
         return interface_data_list
 
     def get_interface_detail(self, interface_id):
@@ -156,6 +158,6 @@ class Yapi:
 
 if __name__ == '__main__':
     yapi = Yapi()
-    # yapi.update_positive_database()
     # yapi.get_cat_menu()
-    yapi.save_positive_data_list()
+    yapi.update_positive_database()
+    # yapi.save_positive_data_list()

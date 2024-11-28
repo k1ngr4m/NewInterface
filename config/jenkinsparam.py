@@ -1,6 +1,6 @@
-token = '7cc6b3191a05b88d2cdbd6726d9afa05c232616a234305ba688d504c46e27b27'
+token = 'c67041b7215e22af196737f92cf1af8a34ea52eb64c02f79422fff9070d5d529'
 corpid = 'ding66041eb1c6df73f535c2f4657eb6378f'
 userid = '215252650523902241'
 environment = 'test1'
-login_para = '{"userId":"215252650523902241","corpid":"ding0064986624e3b83b35c2f4657eb6378f","xbbAccessToken":"2ea6d31b757712036351cc8b18db354e13486aaf7c1ce87a10c7e03d27c052a1"}'
+login_para = '{"userId":"215252650523902241","corpid":"ding66041eb1c6df73f535c2f4657eb6378f","xbbAccessToken":"73ec67d33a206fdd1fe1e4605800df728bf3ff610f458bea3f9c9e58b9e1fc9e"}'
 isupdate_database = 'false'

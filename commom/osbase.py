@@ -5,16 +5,26 @@ import json
 import os
 from utils.logutil import logger
 
-
 # 没有文件则创建
 def create_file(filename):
-    try:
-        if not os.path.exists(filename):
-            with open(filename, 'a', encoding='utf-8') as file:
-                file.close()
-                logger.info(f"创建{filename}成功")
-    except Exception as e:
-        logger.error(e)
+    # 获取文件的目录部分
+    dir_name = os.path.dirname(filename)
+
+    # 如果目录不存在，则创建它
+    if not os.path.exists(dir_name):
+        os.makedirs(dir_name)
+        logger.debug(f'创建目录 {dir_name}')
+
+    # 检查文件是否存在
+    if not os.path.exists(filename):
+        logger.debug(f'文件不存在 {filename}')
+        with open(filename, 'a', encoding='utf-8') as file:
+            # 文件关闭操作实际上不需要在这里显式调用，因为with语句会自动处理
+            pass
+        logger.info(f"创建 {filename} 成功")
+    else:
+        logger.info(f"文件已存在 {filename}")
+
 
 
 # 清空文件

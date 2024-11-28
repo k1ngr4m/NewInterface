@@ -26,6 +26,7 @@ class MysqlUtil:
                 self.db.commit()
         except Exception as e:
             self.db.rollback()
+            logger.error(sql)
             logger.error(e)
             logger.error("sql语句执行错误，已执行回滚操作")
             return False
