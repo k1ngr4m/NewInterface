@@ -1,3 +1,5 @@
+import json
+
 import requests as requests
 from utils.readmysql import RdTestcase
 from utils.logutil import logger
@@ -38,15 +40,15 @@ class Yapi:
                 for i in range(len(data)):
                     cat_id = data[i]['_id']
                     name = data[i]['name']
-                    # print(data[i])
+                    # logger.debug(data[i])
                     # 打印项目信息
                     logger.debug(f'cat_id:{cat_id}\t\tname:{name}')
                     cat_id_list.append(cat_id)
             # 返回数据错误
             else:
-                print(errcode)
+                logger.error(errcode)
         except Exception as e:
-            print(e)
+            logger.error(e)
         return cat_id_list
 
     def get_interface_list_cat(self, cat_id_list):
@@ -96,7 +98,8 @@ class Yapi:
                 method = str(data['method']).lower()
                 title = data['title']
                 path = data['path']
-                req_body_other = eval(data['req_body_other'])
+                temp_json = data['req_body_other'].replace("null", '"null"').replace('true', '"true"').replace('false','"false"')
+                req_body_other = json.loads(temp_json)
                 relation = data['markdown']
                 status = data['status']
 
@@ -117,9 +120,9 @@ class Yapi:
                 }
                 return interface_data_dict
             else:
-                print(response['errcode'])
+                logger.error(response['errcode'])
         except Exception as e:
-            print(e)
+            logger.error(e)
 
     def save_positive_data_list(self):
         cat_id_list = self.get_cat_menu()
