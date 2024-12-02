@@ -18,13 +18,14 @@ _report_path = project_path + os.sep + "report"
 
 # 数据库配置信息
 DB_CONFIG = {
-    "host": "localhost",
+    "host": "1.15.174.185",
     "user": "root",
-    "password": "root",
-    "database": "InterfaceTest",
+    "password": "ColayKD41",
+    "database": "xbbInterface",
     "port": 3306,
     "charset": "utf8"
 }
+
 
 
 # 返回日志目录
