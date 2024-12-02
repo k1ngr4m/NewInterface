@@ -3,10 +3,10 @@ import hashlib
 import json
 from string import Template
 import re
-from config.jenkinsparam import token
-from config.jenkinsparam import corpid
-from config.jenkinsparam import userid
-from config.jenkinsparam import login_para
+from config.param import token
+from config.param import corpid
+from config.param import userid
+from config.param import login_para
 
 
 # 生成请求头里的sign值

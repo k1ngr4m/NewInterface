@@ -10,7 +10,7 @@ from config.settings import DynamicParam
 from utils.logutil import logger
 from utils.readmysql import RdTestcase
 from utils.requestsutil import RequestSend
-from config.jenkinsparam import environment
+from config.param import environment
 
 case_data = RdTestcase()
 case_list_positive = case_data.is_run_data('xbb', case_data.case_table_pos)
