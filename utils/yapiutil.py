@@ -10,10 +10,9 @@ negative_case_file = r"utils/data/negative_case.json"
 
 cr = CreateCase()
 sql = RdTestcase()
-url = 'http://yapi.xbongbong.com'
-# token = '841a5e8fb8251976ba069eef55158a12213f715d9465eeb26ac0f1052bcce1a6'
-# token = '02fd2e0c38d31c1e763e25dddaea01972c30b6c0a4d7c7d7abc87ffd0a32fe42'
-token = '962fd4813aa01538ad26ef57555738e4e7c485d5ca656e70be723bb5a35afa4f'
+url = 'http://1.15.174.185:3001'
+# token = '962fd4813aa01538ad26ef57555738e4e7c485d5ca656e70be723bb5a35afa4f'
+token = 'b1f452f0548fc22e45dae451559318279168d085ab2f63b59a82bc5251ef71e9'
 
 class Yapi:
     def __init__(self):
@@ -26,7 +25,7 @@ class Yapi:
             'Content-Type': 'application/x-www-form-urlencoded'
         }
         body = {
-            'project_id': 1867,  # 项目id
+            'project_id': 11,  # 项目id
             'token': token
         }
         cat_id_list = []

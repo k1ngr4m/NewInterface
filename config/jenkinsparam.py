@@ -1,6 +1,6 @@
 token = 'c67041b7215e22af196737f92cf1af8a34ea52eb64c02f79422fff9070d5d529'
 corpid = 'ding66041eb1c6df73f535c2f4657eb6378f'
 userid = '215252650523902241'
-environment = 'test1'
-login_para = '{"userId":"215252650523902241","corpid":"ding66041eb1c6df73f535c2f4657eb6378f","xbbAccessToken":"73ec67d33a206fdd1fe1e4605800df728bf3ff610f458bea3f9c9e58b9e1fc9e"}'
+environment = 'main'
+login_para = '{"userId":"215252650523902241","corpid":"ding66041eb1c6df73f535c2f4657eb6378f","xbbAccessToken":"2b0302563c783d58b8287c75ee7131051ad93ff559bccac14fa07f7010b98495"}'
 isupdate_database = 'false'
