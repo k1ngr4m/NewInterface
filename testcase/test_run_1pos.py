@@ -3,7 +3,8 @@ import datetime
 import json
 import pytest
 import common.base as Base
-from common.base import update_data_with_login_info, get_headers, find_placeholders, replace_placeholders, parse_relation
+from common.base import update_data_with_login_info, get_headers, find_placeholders, replace_placeholders, \
+    parse_relation
 from config.settings import DynamicParam
 from utils.logutil import logger
 from utils.readmysql import RdTestcase
@@ -13,6 +14,7 @@ from config.param import environment
 case_data = RdTestcase()
 case_list_positive = case_data.is_run_data('xbb', case_data.case_table_pos)
 current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
 
 class TestApi:
     def setup_class(self):
@@ -119,6 +121,7 @@ class TestApi:
                 logger.error(f"最终记录: {error_message}")
             case_data.updateResults(res_data, is_pass, str(case['id']))
             assert is_pass
+
 
 if __name__ == '__main__':
     pytest.main(['-s', '-v', 'test_run_1pos.py'])
