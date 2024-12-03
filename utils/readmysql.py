@@ -34,19 +34,19 @@ class RdTestcase:
         current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         sql = f"insert into test_result_record (case_id,times,response,result) values ('{case_id}','{current_time}','{json.dumps(response, ensure_ascii=False)}','{is_pass}')"
         rows = mysql.sql_execute(sql)
-        logger.debug(sql)
+        # logger.debug(sql)
         return rows
 
     def truncateTable(self, table):
         sql = f"truncate table {table}"
         rows = mysql.sql_execute(sql)
-        logger.debug(sql)
+        # logger.debug(sql)
         return rows
 
     def update_case_from_yapi(self, case_table_name, id, title, url, method, request_body, relation, expected_code, isdel):
         sql = f"insert into {case_table_name} (id,web,title,url,method,request_body,request_type,relation,expected_code,isdel) value ('{id}','xbb','{title}','{url}','{method}','{request_body}','json','{relation}',{expected_code},{isdel})"
         rows = mysql.sql_execute(sql)
-        logger.debug(sql)
+        # logger.debug(sql)
         return rows
 
 

@@ -1,7 +1,7 @@
 """
 自动创建测试用例
 """
-import commom.osbase as osbase
+import common.osbase as osbase
 # -*- coding = utf-8 -*-
 
 import json

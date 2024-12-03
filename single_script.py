@@ -1,7 +1,7 @@
 # coding=utf-8
 import time
 
-from commom import base
+from common import base
 from utils.logutil import logger
 from utils.readmysql import RdTestcase
 from utils.requestsutil import RequestSend

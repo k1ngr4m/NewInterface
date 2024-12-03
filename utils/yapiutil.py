@@ -2,7 +2,7 @@ import json
 import requests
 from utils.readmysql import RdTestcase
 from utils.logutil import logger
-from commom.osbase import create_file, write_file, get_case_list  # 假设这些方法存在于commom.osbase模块中
+from common.osbase import create_file, write_file, get_case_list  # 假设这些方法存在于commom.osbase模块中
 from utils.createcaseutil import CreateCase
 
 # 接口文件路径
