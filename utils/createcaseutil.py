@@ -6,6 +6,7 @@ import commom.osbase as osbase
 
 import json
 import re
+from utils.logutil import logger
 
 '''
 自动生成接口用例，规则如下：
@@ -15,6 +16,7 @@ import re
 4: 请求参数中str包含特殊字符
 5: 请求参数中int变更为特殊字符
 '''
+
 
 class CreateCase:
     def __init__(self):
@@ -134,145 +136,82 @@ class CreateCase:
             }
         return None
 
-'''
+    def generate_test_cases(self, init_param, param_key, api_name, auto_case_file, create_case_pattern):
+        if not isinstance(init_param.get(param_key), dict):
+            return
 
-        # 规则3：将dict转换为list
-        temp_param = dict.copy(init_param)
-        if isinstance(temp_param[param_key], dict):
-            # 第二层 key:value处理
-            init_second_level_dict_data = dict(init_param[param_key])
+        # 创建一个临时参数副本用于修改
+        temp_param = init_param.copy()
+        second_level_dict = init_param[param_key].copy()
 
-            # 遍历第二层dict格式的数据
-            for second_level_key in init_second_level_dict_data.keys():
-                temp_param = dict.copy(init_param)
-                temp_second_level_dict = dict.copy(init_second_level_dict_data)
-                # 构造第二层dict数据的key缺失用例
-                temp_second_level_dict[str_none] = temp_second_level_dict.pop(second_level_key)
-                temp_param[param_key] = temp_second_level_dict
-                matchers = create_case_pattern.findall(str(temp_param))
-                for matcher in matchers:
-                    temp_param = str(temp_param).replace(str(matcher), str('\"')).replace('None',
-                                                                                          'null').replace(
-                        'False', 'false').replace('True', 'true')
-                case_data['request_param'] = json.loads(temp_param)
-                second_dict_key_lose = str(api_name) + "中子级dict参数的key" + second_level_key + "缺失"
-                case_data['case_name'] = second_dict_key_lose
-                # 写入自动化用例文件
-                with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
-                    case_write.write(str(case_data) + "\n")
+        def write_case(case_data, case_name):
+            """辅助函数：写入个案到文件"""
+            with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
+                case_write.write(json.dumps(case_data, ensure_ascii=False) + "\n")
+            logger.info(f"Case written: {case_name}")
 
-                # 构造第二层dict数据的value值缺失用例
-                temp_param = dict.copy(init_param)
-                temp_second_level_dict = dict.copy(init_second_level_dict_data)
-                temp_second_level_dict[second_level_key] = str_none
-                temp_param[param_key] = temp_second_level_dict
-                matchers = create_case_pattern.findall(str(temp_param))
-                for matcher in matchers:
-                    temp_param = str(temp_param).replace(str(matcher), str('\"')).replace('None',
-                                                                                          'null').replace(
-                        'False', 'false').replace('True', 'true')
-                case_data['request_param'] = json.loads(temp_param)
-                second_dict_value_lose = str(api_name) + "中子级dict参数" + second_level_key + "的value缺失"
-                case_data['case_name'] = second_dict_value_lose
-                # 写入自动化用例文件
-                with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
-                    case_write.write(str(case_data) + "\n")
+        def prepare_case(temp_param, case_name):
+            """辅助函数：准备并写入个案"""
+            matchers = create_case_pattern.findall(str(temp_param))
+            for matcher in matchers:
+                temp_param_str = str(temp_param).replace(str(matcher), str('\"')).replace('None', 'null').replace(
+                    'False', 'false').replace('True', 'true')
+            try:
+                case_data = {
+                    'request_param': json.loads(temp_param_str),
+                    'case_name': f"{api_name}中{case_name}"
+                }
+                write_case(case_data, case_name)
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse JSON for case {case_name}: {e}")
 
-                # 构造第二层dict数据的int最大值
-                temp_param = dict.copy(init_param)
-                temp_second_level_dict = dict.copy(init_second_level_dict_data)
-                if isinstance(temp_second_level_dict[second_level_key], int):
-                    temp_second_level_dict[second_level_key] = max_int
-                    temp_param[param_key] = temp_second_level_dict
-                    matchers = create_case_pattern.findall(str(temp_param))
-                    for matcher in matchers:
-                        temp_param = str(temp_param).replace(str(matcher), str('\"')).replace('None',
-                                                                                              'null').replace(
-                            'False', 'false').replace('True', 'true')
-                    case_data['request_param'] = json.loads(temp_param)
-                    second_dict_max_int_judge = str(
-                        api_name) + "中子级dict中" + second_level_key + "的int型值为最大整型"
-                    case_data['case_name'] = second_dict_max_int_judge
-                    # 写入自动化用例文件
-                    with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
-                        case_write.write(str(case_data) + "\n")
+        for second_level_key, second_level_value in second_level_dict.items():
+            # 构造第二层dict数据的key缺失用例
+            modified_param = temp_param.copy()
+            modified_param[param_key] = second_level_dict.copy()
+            modified_param[param_key][self.str_none] = modified_param[param_key].pop(second_level_key)
+            prepare_case(modified_param, f"子级dict参数的key {second_level_key} 缺失")
 
-                # 构造第二层dict数据的int最小值
-                temp_param = dict.copy(init_param)
-                temp_second_level_dict = dict.copy(init_second_level_dict_data)
-                if isinstance(temp_second_level_dict[second_level_key], int):
-                    temp_second_level_dict[second_level_key] = min_int
-                    temp_param[param_key] = temp_second_level_dict
-                    matchers = create_case_pattern.findall(str(temp_param))
-                    for matcher in matchers:
-                        temp_param = str(temp_param).replace(str(matcher), str('\"')).replace('None',
-                                                                                              'null').replace(
-                            'False', 'false').replace('True', 'true')
-                    case_data['request_param'] = json.loads(temp_param)
-                    second_dict_min_int_judge = str(
-                        api_name) + "中子级dict中" + second_level_key + "的int型值为最小整型"
-                    case_data['case_name'] = second_dict_min_int_judge
-                    # 写入自动化用例文件
-                    with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
-                        case_write.write(str(case_data) + "\n")
+            # 构造第二层dict数据的value值缺失用例
+            modified_param = temp_param.copy()
+            modified_param[param_key] = second_level_dict.copy()
+            modified_param[param_key][second_level_key] = self.str_none
+            prepare_case(modified_param, f"子级dict参数 {second_level_key} 的value缺失")
 
-                # 构造第二层dict数据int改为特殊字符
-                temp_param = dict.copy(init_param)
-                temp_second_level_dict = dict.copy(init_second_level_dict_data)
-                if isinstance(temp_second_level_dict[second_level_key], int):
-                    temp_second_level_dict[second_level_key] = content_special_str
-                    matchers = create_case_pattern.findall(str(temp_param))
-                    temp_param[param_key] = temp_second_level_dict
-                    for matcher in matchers:
-                        temp_param = str(temp_param).replace(str(matcher), str('\"')).replace('None',
-                                                                                              'null').replace(
-                            'False', 'false').replace('True', 'true')
-                    case_data['request_param'] = json.loads(temp_param)
-                    second_dict_special_char_judge = str(
-                        api_name) + "中子级dict中" + second_level_key + "的int型值包含特殊字符"
-                    case_data['case_name'] = second_dict_special_char_judge
-                    # 写入自动化用例文件
-                    with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
-                        case_write.write(str(case_data) + "\n")
+            # 根据第二层dict数据类型构造不同类型的测试用例
+            if isinstance(second_level_value, int):
+                # int最大值
+                modified_param = temp_param.copy()
+                modified_param[param_key] = second_level_dict.copy()
+                modified_param[param_key][second_level_key] = self.max_int
+                prepare_case(modified_param, f"子级dict中 {second_level_key} 的int型值为最大整型")
 
-                # 构造第二层dict数据字符串包含特殊字符
-                temp_param = dict.copy(init_param)
-                temp_second_level_dict = dict.copy(init_second_level_dict_data)
-                if isinstance(temp_second_level_dict[second_level_key], str):
-                    temp_second_level_dict[second_level_key] = content_special_str
-                    temp_param[param_key] = temp_second_level_dict
-                    matchers = create_case_pattern.findall(str(temp_param))
-                    for matcher in matchers:
-                        temp_param = str(temp_param).replace(str(matcher), str('\"')).replace('None',
-                                                                                              'null').replace(
-                            'False', 'false').replace('True', 'true')
-                    case_data['request_param'] = json.loads(temp_param)
-                    second_dict_special_char_judge = str(
-                        api_name) + "中子级dict中" + second_level_key + "的str型值包含特殊字符"
-                    case_data['case_name'] = second_dict_special_char_judge
-                    # 写入自动化用例文件
-                    with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
-                        case_write.write(str(case_data) + "\n")
+                # int最小值
+                modified_param = temp_param.copy()
+                modified_param[param_key] = second_level_dict.copy()
+                modified_param[param_key][second_level_key] = self.min_int
+                prepare_case(modified_param, f"子级dict中 {second_level_key} 的int型值为最小整型")
 
-                # 构造第二层dict数据str型值的最大长度(样例为滕王阁序全文)
-                temp_param = dict.copy(init_param)
-                temp_second_level_dict = dict.copy(init_second_level_dict_data)
-                if isinstance(temp_second_level_dict[second_level_key], str):
-                    temp_second_level_dict[second_level_key] = too_long_str
-                    temp_param[param_key] = temp_second_level_dict
-                    matchers = create_case_pattern.findall(str(temp_param))
-                    for matcher in matchers:
-                        temp_param = str(temp_param).replace(str(matcher), str('\"')).replace('None',
-                                                                                              'null').replace(
-                            'False', 'false').replace('True', 'true')
-                    case_data['request_param'] = json.loads(temp_param)
-                    second_dict_special_char_judge = str(
-                        api_name) + "中子级dict中" + second_level_key + "的str型最大值"
-                    case_data['case_name'] = second_dict_special_char_judge
-                    # 写入自动化用例文件
-                    with open(auto_case_file, mode='a+', encoding='utf-8') as case_write:
-                        case_write.write(str(case_data) + "\n")
-'''
+                # int改为特殊字符
+                modified_param = temp_param.copy()
+                modified_param[param_key] = second_level_dict.copy()
+                modified_param[param_key][second_level_key] = self.content_special_str
+                prepare_case(modified_param, f"子级dict中 {second_level_key} 的int型值包含特殊字符")
+
+            elif isinstance(second_level_value, str):
+                # 字符串包含特殊字符
+                modified_param = temp_param.copy()
+                modified_param[param_key] = second_level_dict.copy()
+                modified_param[param_key][second_level_key] = self.content_special_str
+                prepare_case(modified_param, f"子级dict中 {second_level_key} 的str型值包含特殊字符")
+
+                # 字符串的最大长度
+                modified_param = temp_param.copy()
+                modified_param[param_key] = second_level_dict.copy()
+                modified_param[param_key][second_level_key] = self.too_long_str
+                prepare_case(modified_param, f"子级dict中 {second_level_key} 的str型最大值")
+
+
 if __name__ == '__main__':
     cr = CreateCase()
     cr.create_negative_case()
