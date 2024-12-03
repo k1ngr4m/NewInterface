@@ -18,7 +18,7 @@ _report_path = project_path + os.sep + "report"
 
 # 数据库配置信息
 DB_CONFIG = {
-    "host": "1.15.174.185",
+    "host": "122.51.24.16",
     "user": "root",
     "password": "ColayKD41",
     "database": "xbbInterface",

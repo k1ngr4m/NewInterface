@@ -50,8 +50,9 @@ class Yapi:
 
         try:
             method = data['method'].lower()
-            title = data['title']
-            path = data['path']
+            module, title = self.process_title(data['title'])
+
+            path = self.process_path(data['path'])
             req_body_other_raw = data.get('req_body_other', '{}')  # 使用get方法并提供默认值以防键不存在
             relation = data.get('markdown', '')  # 同样地，防止键不存在
             status = int(1) if data.get('status') == 'done' else int(0)
@@ -67,6 +68,7 @@ class Yapi:
             self.id_counter += 1
             interface_data_dict = {
                 'id': self.id_counter,
+                'module': module,
                 'title': title,
                 'method': method,
                 'path': path,
@@ -111,6 +113,7 @@ class Yapi:
             self.sql.update_case_from_yapi(
                 table_name,
                 case['id'],
+                case['module'],
                 case['title'],
                 case['path'],
                 case['method'],
@@ -130,6 +133,32 @@ class Yapi:
     def update_negative_database(self):
         self.create_case.create_negative_case()
         self.update_database(self.sql.case_table_neg, NEGATIVE_CASE_FILE)
+
+
+    def process_title(self, data):
+        # 使用 partition 方法
+        module, _, title = data.partition('-')
+
+        # 如果没有 "-"，则 module 为空，title 为整个 title_temp
+        if not title:
+            module = ''
+            title = data
+
+        return module, title
+
+    def process_path(self, path):
+        # 使用 partition 方法
+        url, _, timestamp = path.partition('?')
+
+        # 如果有"?"，则取前值
+        if _:
+            url = url
+            timestamp = timestamp
+        else:
+            url = path
+            timestamp = ''
+
+        return url
 
 if __name__ == '__main__':
     yapi = Yapi()
