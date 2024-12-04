@@ -1,7 +1,7 @@
 # coding=utf-8
 import requests
 
-from utils.logutil import logger
+from utils.Logutil import logger
 
 
 class RequestSend:

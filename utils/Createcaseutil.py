@@ -1,12 +1,12 @@
 """
 自动创建测试用例
 """
-import common.osbase as osbase
+import common.OSBase as osbase
 # -*- coding = utf-8 -*-
 
 import json
 import re
-from utils.logutil import logger
+from utils.Logutil import logger
 
 '''
 自动生成接口用例，规则如下：

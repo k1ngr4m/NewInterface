@@ -1,6 +1,6 @@
 import pymysql
 from config.settings import DB_CONFIG
-from utils.logutil import logger
+from utils.Logutil import logger
 from pymysql import cursors
 
 

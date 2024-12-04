@@ -1,8 +1,8 @@
 # coding=utf-8
 import datetime
 import json
-from utils.mysqlutil import MysqlUtil
-from utils.logutil import logger
+from utils.Mysqlutil import MysqlUtil
+from utils.Logutil import logger
 
 mysql = MysqlUtil()
 
@@ -17,6 +17,12 @@ class RdTestcase:
         sql = f"select * from {table_name} where web = '{web}'"
         results = mysql.get_fetchall(sql)
         return results
+
+    def load_getUser_case(self, table_name):
+        sql = f"select * from {table_name} where url = '/pro/v1/user/list'"
+        results = mysql.get_fetchall(sql)
+        run_list = [case for case in results if case['isdel'] == 1]
+        return run_list
 
     # 筛选可执行的用例
     def is_run_data(self, web, table_name):
@@ -44,9 +50,24 @@ class RdTestcase:
         return rows
 
     def update_case_from_yapi(self, case_table_name, id, module, title, url, method, request_body, relation, expected_code, isdel):
-        sql = f"insert into {case_table_name} (id,web,module,title,url,method,request_body,request_type,relation,expected_code,isdel) value ('{id}','xbb','{module}','{title}','{url}','{method}','{request_body}','json','{relation}',{expected_code},{isdel})"
+        sql = f"""
+        INSERT INTO {case_table_name} 
+        (id, web, module, title, url, method, request_body, request_type, relation, expected_code, isdel) 
+        VALUES 
+        ('{id}','xbb','{module}','{title}','{url}','{method}','{request_body}','json','{relation}',{expected_code},{isdel})
+        ON DUPLICATE KEY UPDATE
+            module = VALUES(module),
+            title = VALUES(title),
+            url = VALUES(url),
+            method = VALUES(method),
+            request_body = VALUES(request_body),
+            relation = VALUES(relation),
+            expected_code = VALUES(expected_code),
+            isdel = VALUES(isdel)
+            
+        """
         rows = mysql.sql_execute(sql)
-        # logger.debug(sql)
+        # logger.debug(f'update {rows} rows in {case_table_name}')
         return rows
 
 

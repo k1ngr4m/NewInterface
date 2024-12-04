@@ -1,9 +1,11 @@
 import json
 import requests
-from utils.readmysql import RdTestcase
-from utils.logutil import logger
-from common.osbase import create_file, write_file, get_case_list  # 假设这些方法存在于commom.osbase模块中
-from utils.createcaseutil import CreateCase
+
+from common.Base import Base
+from utils.Readmysql import RdTestcase
+from utils.Logutil import logger
+from common.OSBase import create_file, write_file, get_case_list  # 假设这些方法存在于commom.osbase模块中
+from utils.Createcaseutil import CreateCase
 
 # 接口文件路径
 POSITIVE_CASE_FILE = 'utils/data/positive_case.json'
@@ -14,8 +16,9 @@ YAPI_URL = 'http://1.15.174.185:3001'
 YAPI_TOKEN = 'b1f452f0548fc22e45dae451559318279168d085ab2f63b59a82bc5251ef71e9'
 
 
-class Yapi:
+class Yapi(Base):
     def __init__(self):
+        super().__init__()
         self.create_case = CreateCase()
         self.sql = RdTestcase()
         self.id_counter = 0  # 用于生成唯一ID
@@ -54,12 +57,12 @@ class Yapi:
 
             path = self.process_path(data['path'])
             req_body_other_raw = data.get('req_body_other', '{}')  # 使用get方法并提供默认值以防键不存在
-            relation = data.get('markdown', '')  # 同样地，防止键不存在
+            relation = self.process_relation(data.get('markdown', ''))  # 同样地，防止键不存在
             status = int(1) if data.get('status') == 'done' else int(0)
 
             # 尝试解析req_body_other，若失败则记录错误信息并设置为空字典
             try:
-                req_body_other = json.loads(req_body_other_raw.replace("null", '"null"').replace('true', '"true"').replace('false','"false"'))
+                req_body_other = json.loads(self.trans_bool_str(req_body_other_raw))
             except json.JSONDecodeError as e:
                 logger.error(f"Failed to parse req_body_other for interface {interface_id}: {e}")
                 req_body_other = {}
@@ -104,12 +107,10 @@ class Yapi:
 
     # 更新数据库表
     def update_database(self, table_name, file_name):
-        self.sql.truncateTable(table_name)
+        # self.sql.truncateTable(table_name)
         case_list = get_case_list(file_name)
         for case in case_list:
-            request_body = str(case['req_body']).replace("'", '"').replace('"None"', 'None').replace('"False',
-                                                                                                     'False').replace(
-                '"True"', 'True')
+            request_body = self.trans_str_str(str(case['req_body']))
             self.sql.update_case_from_yapi(
                 table_name,
                 case['id'],
@@ -122,7 +123,7 @@ class Yapi:
                 case['expected_code'],
                 case['isdel']
             )
-        logger.info(f'写入数据库{table_name}成功')
+        logger.debug(f'写入数据库{table_name}成功')
 
     # 更新正面用例数据库
     def update_positive_database(self):
@@ -134,31 +135,27 @@ class Yapi:
         self.create_case.create_negative_case()
         self.update_database(self.sql.case_table_neg, NEGATIVE_CASE_FILE)
 
-
     def process_title(self, data):
         # 使用 partition 方法
-        module, _, title = data.partition('-')
+        module, sep, title = data.partition('-')
 
-        # 如果没有 "-"，则 module 为空，title 为整个 title_temp
-        if not title:
-            module = ''
-            title = data
+        # 如果没有 "-"，则 module 为空，title 为整个 data
+        module = '' if not sep else module
+        title = data if not sep else title
 
         return module, title
 
     def process_path(self, path):
         # 使用 partition 方法
-        url, _, timestamp = path.partition('?')
+        url, sep, timestamp = path.partition('?')
 
-        # 如果有"?"，则取前值
-        if _:
-            url = url
-            timestamp = timestamp
-        else:
-            url = path
-            timestamp = ''
+        # 如果有 "?"，则取前值，否则 timestamp 为空
+        url = path if not sep else url
 
         return url
+
+    def process_relation(self, relation):
+        return relation.replace("\\","")
 
 if __name__ == '__main__':
     yapi = Yapi()

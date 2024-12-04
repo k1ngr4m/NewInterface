@@ -2,18 +2,17 @@
 import datetime
 import json
 import pytest
-import common.base as Base
-from common.base import update_data_with_login_info, get_headers, find_placeholders, replace_placeholders, \
-    parse_relation
 from config.settings import DynamicParam
-from utils.logutil import logger
-from utils.readmysql import RdTestcase
-from utils.requestsutil import RequestSend
+from utils.Logutil import logger
+from utils.Readmysql import RdTestcase
+from utils.Requestsutil import RequestSend
 from config.param import environment
+from common.InterfaceDetail import InterfaceDetail
 
 case_data = RdTestcase()
 case_list_positive = case_data.is_run_data('xbb', case_data.case_table_pos)
 current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+bs = InterfaceDetail()
 
 
 class TestApi:
@@ -29,6 +28,7 @@ class TestApi:
 
     def run(self, case):
         conf_key = case_data.loadConfkey('xbb', environment)
+        path = case['url']
         url = conf_key['value'] + case['url']
         headers = eval(conf_key['headers'])
         method = case['method']
@@ -38,14 +38,16 @@ class TestApi:
 
         # 更新数据中的登录信息
         key_map = {'corpid': '', 'userId': ''}
-        data = update_data_with_login_info(data, key_map)
+        data = bs.update_data_with_login_info(data, key_map)
 
         # 处理数据和头部中的占位符
-        data = replace_placeholders(data, self.get_dynamic_params())
-        headers = replace_placeholders(headers, self.get_dynamic_params())
+        data = bs.replace_placeholders(data, self.get_dynamic_params())
+        headers = bs.replace_placeholders(headers, self.get_dynamic_params())
+
+        data = bs.getInterfaceDetail(path, data)
 
         # 添加签名到请求头
-        headers = get_headers(data, headers)
+        headers = bs.get_headers(data, headers)
 
         try:
             logger.info(f"正在执行 {case_name} 用例")
@@ -58,6 +60,10 @@ class TestApi:
         # 如果响应中有需要关联的变量，设置动态参数
         if res_data and relation != "None":
             self.set_relation(relation, res_data)
+
+        # 处理一下memberList
+        if path == '/pro/v1/user/list':
+            bs.get_user_list(res_data)
 
         # 断言响应结果
         self.assert_response(case, res_data)
@@ -74,7 +80,7 @@ class TestApi:
             if relation:
                 for rel in relation.split(","):
                     var_name, path = rel.split("=")
-                    value = parse_relation(path.split("."), res_data)
+                    value = bs.parse_relation(path.split("."), res_data)
                     setattr(DynamicParam, var_name, value)
                     logger.info(f"设置动态参数: {var_name}={value}")
         except Exception as e:

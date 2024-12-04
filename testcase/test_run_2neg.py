@@ -2,18 +2,17 @@
 import datetime
 import json
 import pytest
-import common.base as Base
-from common.base import update_data_with_login_info, get_headers, find_placeholders, replace_placeholders, \
-    parse_relation
+from common.Base import Base
 from config.settings import DynamicParam
-from utils.logutil import logger
-from utils.readmysql import RdTestcase
-from utils.requestsutil import RequestSend
+from utils.Logutil import logger
+from utils.Readmysql import RdTestcase
+from utils.Requestsutil import RequestSend
 from config.param import environment
 
 case_data = RdTestcase()
 case_list_negative = case_data.is_run_data('xbb', case_data.case_table_neg)
 current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+bs = Base()
 
 
 class TestApi:
@@ -38,14 +37,14 @@ class TestApi:
 
         # 更新数据中的登录信息
         key_map = {'corpid': '', 'userId': ''}
-        data = update_data_with_login_info(data, key_map)
+        data = bs.update_data_with_login_info(data, key_map)
 
         # 处理数据和头部中的占位符
-        data = replace_placeholders(data, self.get_dynamic_params())
-        headers = replace_placeholders(headers, self.get_dynamic_params())
+        data = bs.replace_placeholders(data, self.get_dynamic_params())
+        headers = bs.replace_placeholders(headers, self.get_dynamic_params())
 
         # 添加签名到请求头
-        headers = get_headers(data, headers)
+        headers = bs.get_headers(data, headers)
 
         try:
             logger.info(f"正在执行 {case_name} 用例")

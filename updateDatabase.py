@@ -1,4 +1,4 @@
-from utils.yapiutil import Yapi
+from utils.Yapiutil import Yapi
 if __name__ == '__main__':
     yapi = Yapi()
     yapi.update_positive_database()
