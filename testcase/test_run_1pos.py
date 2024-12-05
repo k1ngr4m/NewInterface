@@ -1,4 +1,6 @@
 # coding=utf-8
+import time
+
 import datetime
 import json
 import pytest
@@ -44,7 +46,8 @@ class TestApi:
         data = bs.replace_placeholders(data, self.get_dynamic_params())
         headers = bs.replace_placeholders(headers, self.get_dynamic_params())
 
-        data = bs.getInterfaceDetail(path, data)
+        # 前置数据处理
+        data = bs.pre_process_detail(path, data)
 
         # 添加签名到请求头
         headers = bs.get_headers(data, headers)
@@ -61,9 +64,8 @@ class TestApi:
         if res_data and relation != "None":
             self.set_relation(relation, res_data)
 
-        # 处理一下memberList
-        if path == '/pro/v1/user/list':
-            bs.get_user_list(res_data)
+        # 后置数据处理
+        bs.after_process_detail(path, res_data)
 
         # 断言响应结果
         self.assert_response(case, res_data)

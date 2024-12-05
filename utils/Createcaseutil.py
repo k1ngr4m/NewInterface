@@ -88,6 +88,7 @@ class CreateCase:
         self.id += 1
         return {
             'id': self.id,
+            'module': init_dict['module'],
             'title': f"{init_dict['title']}正常入参",
             'method': init_dict['method'],
             'path': init_dict['path'],
@@ -126,6 +127,7 @@ class CreateCase:
             self.id += 1
             return {
                 'id': self.id,
+                'module': init_dict['module'],
                 'title': case_name,
                 'method': init_dict['method'],
                 'path': init_dict['path'],
