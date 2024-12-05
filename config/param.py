@@ -1,3 +1,3 @@
-environment = 'main'
-login_para = '{"userId":"215252650523902241","corpid":"ding66041eb1c6df73f535c2f4657eb6378f","xbbAccessToken":"29914dde2c97c0a0c9f9936beb161445b00bd1e3651b01f82413d70036d2c368"}'
+environment = 'test1'
+login_para = '{"userId":"215252650523902241","corpid":"ding66041eb1c6df73f535c2f4657eb6378f","xbbAccessToken":"64c01cec1fd2fa6be76acf88975352e4cba2e86cbe6fe37412c515b3836c4e23"}'
 isupdate_database = 'false'
