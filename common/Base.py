@@ -148,3 +148,7 @@ if __name__ == '__main__':
     # original_data = {"admin-token": "${token}"}
     # replacement_data = {'token': 'k1ngr4m'}
     # print(bs.replace_placeholders(original_data, replacement_data))
+    para = {"corpid":"ding66041eb1c6df73f535c2f4657eb6378f","userId":"215252650523902241","platform":"web","businessType":21500}
+    token = "29914dde2c97c0a0c9f9936beb161445b00bd1e3651b01f82413d70036d2c368"
+    sign = bs.create_sign_code(para,token)
+    print(sign)
