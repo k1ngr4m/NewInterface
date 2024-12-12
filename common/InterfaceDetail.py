@@ -12,6 +12,8 @@ class InterfaceDetail(RandomDataBase):
     def pre_process_detail(self, url, data):
         if url == '/pro/v1/form/data/add':
             self.todowork.process_form_data_add(data)
+        elif url == '/pro/v1/todo/list':
+            self.todowork.process_todo_list(data)
         return data
 
     def after_process_detail(self, url, data):

@@ -7,33 +7,43 @@ class TodoWork(RandomDataBase):
     def __init__(self):
         super().__init__()
 
-    def process_form_data_add(self, form_data):
+    def process_form_data_add(self, data):
         """
         处理表单数据
-        :param form_data: 表单数据
+        :param data: 表单数据
         :return: 处理后的表单数据
         """
         ownerId_data = self.get_random_ownerId()
         coUserId = self.get_random_coUserId(exclude_user_ids=[ownerId_data['id']])
         start_timestamp = self.get_random_timestamp()
         end_timestamp = self.get_random_timestamp(start_timestamp=start_timestamp)
-        form_data['dataList'].update({
+        data['dataList'].update({
             'text_1': self.get_random_text(),
             'ownerId': [ownerId_data],
             'coUserId': coUserId,
             'date_1': start_timestamp,
             'date_2': end_timestamp,
-            'text_3': self.get_random_text3(coUserId),
-            'text_4': self.get_random_text4(),
-            'text_5': self.get_random_text5(),
+            'text_3': self.get_random_todo_description(coUserId),
+            'text_4': self.get_random_todo_reminder(),
+            'text_5': self.get_random_todo_priority(),
         })
-        form_data.update({
+        data.update({
             'ownerId': [ownerId_data],
             'coUserId': coUserId
         })
-        return form_data
+        return data
 
-    def get_random_text3(self, atUser_list=None):
+    def process_todo_list(self, data):
+        """
+        处理待办列表
+        :param data: 待办列表数据
+        :return: 处理后的待办列表数据
+        """
+        data.update({
+            'groupConditionAlias': self.get_random_todo_groupConditionAlias()
+        })
+
+    def get_random_todo_description(self, atUser_list=None):
         """
         随机生成任务描述字段
         :return: 任务描述字段的值(text3)
@@ -48,7 +58,7 @@ class TodoWork(RandomDataBase):
         }
         return text3
 
-    def get_random_text4(self):
+    def get_random_todo_reminder(self):
         """
         随机生成任务截止提醒字段
         :return:任务截止提醒字段的值(text4)
@@ -63,7 +73,7 @@ class TodoWork(RandomDataBase):
         ]
         return random.choice(items)
 
-    def get_random_text5(self):
+    def get_random_todo_priority(self):
         """
         随机生成任务优先级
         :return:任务优先级字段的值(text5)
@@ -74,4 +84,12 @@ class TodoWork(RandomDataBase):
             {"color": "#FFB521", "isVisible": 1, "text": "高", "value": "3"},
             {"color": "#F7716C", "isVisible": 1, "text": "最高", "value": "4" }
         ]
+        return random.choice(items)
+
+    def get_random_todo_groupConditionAlias(self):
+        """
+        随机生成任务分组条件
+        :return:任务分组条件字段的值(groupConditionAlias)
+        """
+        items = ["allWorkTask", "toExecute", "toCreate", "toParticipate"]
         return random.choice(items)
